@@ -11,6 +11,7 @@ def capitalize_game_name(game):
     return ''.join([g.capitalize() for g in game.split('_')])
 
 
+# dopamine style Atari wrapper
 class AtariEnv(gym.Env):
     def __init__(self, game, frameskip=4, **kwargs):
         # set action_probability=0.25
@@ -28,7 +29,9 @@ class AtariEnv(gym.Env):
 
     def reset(self):
         self.env.reset()
-        self._fetch_grayscale_observation(self.screen_buffer[0])
+        dummy = np.zeros((84, 84), dtype=np.uint8)
+        self._fetch_grayscale_observation(dummy)
+        self.screen_buffer[0][...] = dummy
         self.screen_buffer[1].fill(0)
         return self._pool_and_resize()
 
@@ -43,7 +46,9 @@ class AtariEnv(gym.Env):
                 break
             elif time_step >= self.frameskip - 2:
                 t = time_step - (self.frameskip - 2)
-                self._fetch_grayscale_observation(self.screen_buffer[t])
+                dummy = np.zeros((84, 84), dtype=np.uint8)
+                self._fetch_grayscale_observation(dummy)
+                self.screen_buffer[t][...] = dummy
 
         observation = self._pool_and_resize()
 
@@ -54,9 +59,8 @@ class AtariEnv(gym.Env):
         return output
 
     def _pool_and_resize(self):
-        np.maximum(self.screen_buffer[0],
-                   self.screen_buffer[1],
-                   out=self.screen_buffer[0])
+        max_pixel = np.max(self.screen_buffer, axis=0)
+        self.screen_buffer[0][...] = max_pixel
 
         resized_screen = cv2.resize(self.screen_buffer[0], (84, 84),
                                     interpolation=cv2.INTER_AREA)
