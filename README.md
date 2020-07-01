@@ -21,7 +21,7 @@ import d4rl_atari
 
 env = gym.make('breakout-mixed-v0') # -v{0, 1, 2, 3, 4} for datasets with the other random seeds
 
-# interaction with its environment though dopamine-style Atari wrapper
+# interaction with its environment through dopamine-style Atari wrapper
 env.reset() # observation is resized to 84x84 with frameskipping=4 enabled
 env.step(env.action_space.sample())
 
