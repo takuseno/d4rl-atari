@@ -15,5 +15,5 @@ def test_env():
     observation = env.reset()
     assert observation.shape == (84, 84, 1)
 
-    #observation = env.step(1)
-    #assert observation.shape[0] == (84, 84, 1)
+    observation = env.step(1)[0]
+    assert observation.shape == (84, 84, 1)

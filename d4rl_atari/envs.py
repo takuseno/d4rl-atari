@@ -23,15 +23,15 @@ class AtariEnv(gym.Env):
                                             dtype=np.uint8)
         self.action_space = atari_env.action_space
         self.env = atari_env.env
+        self.screen_shape = atari_env.observation_space.shape[:2]
 
         self.frameskip = frameskip
-        self.screen_buffer = np.zeros((2, 84, 84), dtype=np.uint8)
+        self.screen_buffer = np.zeros((2, ) + self.screen_shape,
+                                      dtype=np.uint8)
 
     def reset(self):
         self.env.reset()
-        dummy = np.zeros((84, 84), dtype=np.uint8)
-        self._fetch_grayscale_observation(dummy)
-        self.screen_buffer[0][...] = dummy
+        self._fetch_grayscale_observation(self.screen_buffer[0])
         self.screen_buffer[1].fill(0)
         return self._pool_and_resize()
 
@@ -46,9 +46,7 @@ class AtariEnv(gym.Env):
                 break
             elif time_step >= self.frameskip - 2:
                 t = time_step - (self.frameskip - 2)
-                dummy = np.zeros((84, 84), dtype=np.uint8)
-                self._fetch_grayscale_observation(dummy)
-                self.screen_buffer[t][...] = dummy
+                self._fetch_grayscale_observation(self.screen_buffer[t])
 
         observation = self._pool_and_resize()
 
