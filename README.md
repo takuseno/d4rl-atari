@@ -4,10 +4,13 @@
 
 # d4rl-atari
 Datasets for Data-Driven Deep Reinforcement Learning with Atari environments.
-This project is intending to provide the easy-to-use wrapper for [the datasets are provided by Google](https://research.google/tools/datasets/dqn-replay/).
-The dataset structure is designed for Google's [Dopamine](https://github.com/google/dopamine) so that the datasets are not friendly to developers that don't use the framework.
+This project is intending to provide the easy-to-use wrapper for
+[the datasets provided by Google](https://research.google/tools/datasets/dqn-replay/).
+The dataset structure is designed for Google's [Dopamine](https://github.com/google/dopamine)
+so that the datasets are not friendly to developers that don't use the framework.
 
-In order to let everyone use the datasets much easier, this library is designed as Atari version of[d4rl](https://github.com/rail-berkeley/d4rl).
+In order to let everyone use the datasets much easier, this library is designed
+as Atari version of [d4rl](https://github.com/rail-berkeley/d4rl).
 You can access to the Atari datasets just like d4rl only with few lines of codes.
 
 ## usage
