@@ -18,21 +18,9 @@ def inspect_dir_path(env, index, epoch, base_dir=BASE_DIR):
     if not os.path.exists(path):
         return False
     for name in ['observation', 'action', 'reward', 'terminal']:
-        if not os.path.exists(os.path.join(path, name + '.npy')):
+        if not os.path.exists(os.path.join(path, name + '.gz')):
             return False
     return True
-
-
-def unzip(path):
-    with gzip.open(path, 'rb') as gzip_f:
-        npy_path = path.replace('gz', 'npy')
-        with open(npy_path, 'wb') as f:
-            # read in chunks otherwise OSError occurs
-            while True:
-                chunk = gzip_f.read(1024)
-                if not chunk:
-                    break
-                f.write(chunk)
 
 
 def _download(name, env, index, epoch, dir_path):
@@ -44,28 +32,19 @@ def _download(name, env, index, epoch, dir_path):
     return path
 
 
+def _load(name, dir_path):
+    path = os.path.join(dir_path, name + '.gz')
+    with gzip.open(path, 'rb') as f:
+        print('loading {}...'.format(path))
+        return np.load(f, allow_pickle=False)
+
+
 def download_dataset(env, index, epoch, base_dir=BASE_DIR):
     dir_path = get_dir_path(env, index, epoch, base_dir)
-
-    # download observation
-    observation_path = _download('observation', env, index, epoch, dir_path)
-    print('decompressing observation.gz...')
-    unzip(observation_path)
-
-    # download action
-    action_path = _download('action', env, index, epoch, dir_path)
-    print('decompressing action.gz...')
-    unzip(action_path)
-
-    # download reward
-    reward_path = _download('reward', env, index, epoch, dir_path)
-    print('decompressing reward.gz...')
-    unzip(reward_path)
-
-    # download terminal
-    terminal_path = _download('terminal', env, index, epoch, dir_path)
-    print('decompressing terminal.gz...')
-    unzip(terminal_path)
+    _download('observation', env, index, epoch, dir_path)
+    _download('action', env, index, epoch, dir_path)
+    _download('reward', env, index, epoch, dir_path)
+    _download('terminal', env, index, epoch, dir_path)
 
 
 class OfflineEnv(gym.Env):
@@ -92,11 +71,12 @@ class OfflineEnv(gym.Env):
                 os.makedirs(path, exist_ok=True)
                 download_dataset(self.game, self.index, epoch)
 
-            observations = np.load(os.path.join(path, 'observation.npy'))
-            actions = np.load(os.path.join(path, 'action.npy'))
-            rewards = np.load(os.path.join(path, 'reward.npy'))
-            terminals = np.load(os.path.join(path, 'terminal.npy'))
+            observations = _load('observation', path)
+            actions = _load('action', path)
+            rewards = _load('reward', path)
+            terminals = _load('terminal', path)
 
+            # sanity check
             assert observations.shape == (1000000, 84, 84)
             assert actions.shape == (1000000, )
             assert rewards.shape == (1000000, )
