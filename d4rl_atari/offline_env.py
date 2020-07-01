@@ -3,8 +3,7 @@ import os
 import gym
 import gzip
 
-from subprocess import Popen 
-
+from subprocess import Popen
 
 URI = 'gs://atari-replay-datasets/dqn/{}/{}/replay_logs/'
 BASE_DIR = os.path.join(os.environ['HOME'], '.d4rl', 'datasets')
@@ -99,9 +98,9 @@ class OfflineEnv(gym.Env):
             terminals = np.load(os.path.join(path, 'terminal.npy'))
 
             assert observations.shape == (1000000, 84, 84)
-            assert actions.shape == (1000000,)
-            assert rewards.shape == (1000000,)
-            assert terminals.shape == (1000000,)
+            assert actions.shape == (1000000, )
+            assert rewards.shape == (1000000, )
+            assert terminals.shape == (1000000, )
 
             observation_stack.append(observations)
             action_stack.append(actions)

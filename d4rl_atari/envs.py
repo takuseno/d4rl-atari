@@ -16,7 +16,10 @@ class AtariEnv(gym.Env):
         # set action_probability=0.25
         env_id = '{}NoFrameskip-v0'.format(game)
         atari_env = gym.make(env_id)
-        self.observation_space = spaces.Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
+        self.observation_space = spaces.Box(low=0,
+                                            high=255,
+                                            shape=(84, 84, 1),
+                                            dtype=np.uint8)
         self.action_space = atari_env.action_space
         self.env = atari_env.env
 
@@ -51,14 +54,16 @@ class AtariEnv(gym.Env):
         return output
 
     def _pool_and_resize(self):
-        np.maximum(self.screen_buffer[0], self.screen_buffer[1], out=self.screen_buffer[0])
+        np.maximum(self.screen_buffer[0],
+                   self.screen_buffer[1],
+                   out=self.screen_buffer[0])
 
-        resized_screen = cv2.resize(self.screen_buffer[0], (84, 84), interpolation=cv2.INTER_AREA)
+        resized_screen = cv2.resize(self.screen_buffer[0], (84, 84),
+                                    interpolation=cv2.INTER_AREA)
 
         image = np.asarray(resized_screen, dtype=np.uint8)
 
         return np.expand_dims(image, axis=2)
-
 
 
 class OfflineAtariEnv(AtariEnv, OfflineEnv):
