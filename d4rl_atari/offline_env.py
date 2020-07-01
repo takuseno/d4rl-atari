@@ -109,9 +109,9 @@ class OfflineEnv(gym.Env):
 
         data_dict = {
             'observations': np.vstack(observation_stack),
-            'actions': np.vstack(action_stack),
-            'rewards': np.vstack(reward_stack),
-            'terminals': np.vstack(terminal_stack)
+            'actions': np.vstack(action_stack).reshape(-1),
+            'rewards': np.vstack(reward_stack).reshape(-1),
+            'terminals': np.vstack(terminal_stack).reshape(-1)
         }
 
         return data_dict
