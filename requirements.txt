@@ -1,0 +1,5 @@
+atari-py==0.2.6
+gsutil==4.51
+gym==0.17.2
+numpy==1.19.0
+opencv-python==4.2.0.34
