@@ -42,8 +42,8 @@ env = gym.make('[GAME]-{mixed,medium,expert}-v{0, 1, 2, 3, 4}')
 ```
 
 - `mixed` denotes datasets collected at the first 1M steps.
-- `medium` denotes datasets collected between 9M steps and 10M steps.
-- `expert` denotes datasets collected at the last of training (last 1M steps).
+- `medium` denotes datasets collected at between 9M steps and 10M steps.
+- `expert` denotes datasets collected at the last 1M steps.
 
 
 ## contribution
