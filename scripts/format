@@ -6,4 +6,4 @@ else
   YAPF_ARG=$*
 fi
 
-yapf -r -vv $YAPF_ARG d4rl_atari
+yapf -r -vv $YAPF_ARG d4rl_atari tests

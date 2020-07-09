@@ -7,4 +7,5 @@ setup(name="d4rl_atari",
       description="Datasets for data-driven deep reinforcement learnig with Atari (wrapper for datasets released by Google)",
       url="https://github.com/takuseno/d4rl-atari",
       install_requires=["atari-py", "gym", "gsutil", "numpy", "opencv-python"],
-      packages=find_packages())
+      packages=find_packages("d4rl_atari"),
+      package_dir={"": "d4rl_atari"})
