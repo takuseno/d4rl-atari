@@ -13,6 +13,11 @@ In order to let everyone use the datasets much easier, this library is designed
 as Atari version of [d4rl](https://github.com/rail-berkeley/d4rl).
 You can access to the Atari datasets just like d4rl only with few lines of codes.
 
+## install
+```
+$ pip install git+https://github.com/takuseno/d4rl-atari
+```
+
 ## usage
 The API is mostly identical to the original d4rl.
 ```py
