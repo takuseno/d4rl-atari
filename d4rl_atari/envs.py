@@ -13,27 +13,34 @@ def capitalize_game_name(game):
 
 # dopamine style Atari wrapper
 class AtariEnv(gym.Env):
-    def __init__(self, game, frameskip=4, **kwargs):
+    def __init__(self, game, frameskip=4, stack=True, **kwargs):
         # set action_probability=0.25
         env_id = '{}NoFrameskip-v0'.format(game)
         atari_env = gym.make(env_id)
+        n_channels = 4 if stack else 1
         self.observation_space = spaces.Box(low=0,
                                             high=255,
-                                            shape=(84, 84, 1),
+                                            shape=(n_channels, 84, 84),
                                             dtype=np.uint8)
         self.action_space = atari_env.action_space
         self.env = atari_env.env
         self.screen_shape = atari_env.observation_space.shape[:2]
+        self.stack = stack
 
         self.frameskip = frameskip
         self.screen_buffer = np.zeros((2, ) + self.screen_shape,
                                       dtype=np.uint8)
+        self.stack_buffer = np.zeros((4, 84, 84), dtype=np.uint8)
 
     def reset(self):
         self.env.reset()
         self._fetch_grayscale_observation(self.screen_buffer[0])
         self.screen_buffer[1].fill(0)
-        return self._pool_and_resize()
+        self.stack_buffer.fill(0)
+        observation = self._pool_and_resize()
+        if self.stack:
+            return self._stack(observation)
+        return observation
 
     def step(self, action):
         accumulated_reward = 0.0
@@ -50,6 +57,9 @@ class AtariEnv(gym.Env):
 
         observation = self._pool_and_resize()
 
+        if self.stack:
+            observation = self._stack(observation)
+
         return observation, accumulated_reward, done, info
 
     def _fetch_grayscale_observation(self, output):
@@ -65,7 +75,12 @@ class AtariEnv(gym.Env):
 
         image = np.asarray(resized_screen, dtype=np.uint8)
 
-        return np.expand_dims(image, axis=2)
+        return np.expand_dims(image, axis=0)
+
+    def _stack(self, observation):
+        self.stack_buffer = np.roll(self.stack_buffer, -1, axis=0)
+        self.stack_buffer[-1][...] = observation[0]
+        return self.stack_buffer
 
 
 class OfflineAtariEnv(AtariEnv, OfflineEnv):
