@@ -33,12 +33,14 @@ dataset['rewards'] # reward data in 1M
 dataset['terminals'] # terminal flags in 1M
 ```
 
-The observations included in dataset are shaped in `(1000000, 84. 84)` without stacked.
+The observations included in dataset are shaped in `(1000000, 84, 84)` without
+stacked.
 To easily feed this dataset to RL models, the observations should be stacked
 with consecutive 4 frames.
-However, simply making up ndarray with shape of `(1000000, 4, 84. 84)` consumes
-more than 26GiB memory just for dataset, which is quite large for most desktop
-computers.
+However, simply making up ndarray with shape of `(1000000, 4, 84, 84)` consumes
+more than 26GiB of memory just for dataset, which is quite large for most
+desktop computers.
+
 Therefore, `d4rl-atari` package stacks frames without copying images by
 remaining pointers to the original data, which eventually saves around 20GiB
 of memory.
