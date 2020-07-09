@@ -47,18 +47,42 @@ def download_dataset(env, index, epoch, base_dir=BASE_DIR):
     _download('terminal', env, index, epoch, dir_path)
 
 
+def _stack(observations, terminals, n_channels=4):
+    rets = []
+    t = 1
+    for i in range(observations.shape[0]):
+        if t < n_channels:
+            padding_shape = (n_channels - t, ) + observations.shape[1:]
+            padding = np.zeros(padding_shape, dtype=np.uint8)
+            observation = observations[i - t + 1:i + 1]
+            observation = np.vstack([padding, observation])
+        else:
+            # avoid copying data
+            observation = observations[i - n_channels + 1:i + 1]
+
+        rets.append(observation)
+
+        if terminals[i]:
+            t = 1
+        else:
+            t += 1
+    return rets
+
+
 class OfflineEnv(gym.Env):
     def __init__(self,
                  game=None,
                  index=None,
                  start_epoch=None,
                  last_epoch=None,
+                 stack=True,
                  **kwargs):
         super(OfflineEnv, self).__init__(**kwargs)
         self.game = game
         self.index = index
         self.start_epoch = start_epoch
         self.last_epoch = last_epoch
+        self.stack = stack
 
     def get_dataset(self):
         observation_stack = []
@@ -87,11 +111,20 @@ class OfflineEnv(gym.Env):
             reward_stack.append(rewards)
             terminal_stack.append(terminals)
 
+        observations = np.vstack(observation_stack)
+        actions = np.vstack(action_stack).reshape(-1)
+        rewards = np.vstack(reward_stack).reshape(-1)
+        temrinals = np.vstack(terminal_stack).reshape(-1)
+
+        # memory-efficient stacking
+        if self.stack:
+            observations = _stack(observations, terminals)
+
         data_dict = {
-            'observations': np.vstack(observation_stack),
-            'actions': np.vstack(action_stack).reshape(-1),
-            'rewards': np.vstack(reward_stack).reshape(-1),
-            'terminals': np.vstack(terminal_stack).reshape(-1)
+            'observations': observations,
+            'actions': actions,
+            'rewards': rewards,
+            'terminals': terminals
         }
 
         return data_dict

@@ -27,10 +27,27 @@ env.step(env.action_space.sample())
 
 # dataset will be automatically downloaded into ~/.d4rl/datasets/[GAME]/[INDEX]/[EPOCH]
 dataset = env.get_dataset()
-dataset['observations'] # observation data in 1M x 84 x 84
+dataset['observations'] # observation data in list of 1M ndarrays with shape of 4 x 84 x 84 
 dataset['actions'] # action data in 1M
 dataset['rewards'] # reward data in 1M
 dataset['terminals'] # terminal flags in 1M
+```
+
+The observations included in dataset are shaped in `(1000000, 84. 84)` without stacked.
+To easily feed this dataset to RL models, the observations should be stacked
+with consecutive 4 frames.
+However, simply making up ndarray with shape of `(1000000, 4, 84. 84)` consumes
+more than 26GiB memory just for dataset, which is quite large for most desktop
+computers.
+Therefore, `d4rl-atari` package stacks frames without copying images by
+remaining pointers to the original data, which eventually saves around 20GiB
+of memory.
+To do so, the `dataset['observations']` is a builtin `list` obejct containing
+1M 4x84x84 images.
+
+```py
+type(dataset['observations']) # list
+dataset['observations'][0].shape # (4, 84, 84)
 ```
 
 ## available datasets
