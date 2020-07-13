@@ -20,6 +20,7 @@ for game in [
     for index in range(5):
         register(id='{}-mixed-v{}'.format(game, index),
                  entry_point='d4rl_atari.envs:OfflineAtariEnv',
+                 max_episode_steps=108000,
                  kwargs={
                      'game': game,
                      'index': index + 1,
@@ -29,6 +30,7 @@ for game in [
 
         register(id='{}-medium-v{}'.format(game, index),
                  entry_point='d4rl_atari.envs:OfflineAtariEnv',
+                 max_episode_steps=108000,
                  kwargs={
                      'game': game,
                      'index': index + 1,
@@ -38,6 +40,7 @@ for game in [
 
         register(id='{}-expert-v{}'.format(game, index),
                  entry_point='d4rl_atari.envs:OfflineAtariEnv',
+                 max_episode_steps=108000,
                  kwargs={
                      'game': game,
                      'index': index + 1,
