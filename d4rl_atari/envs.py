@@ -82,6 +82,9 @@ class AtariEnv(gym.Env):
         self.stack_buffer[-1][...] = observation[0]
         return self.stack_buffer
 
+    def render(self, mode='human'):
+        self.env.render(mode)
+
 
 class OfflineAtariEnv(AtariEnv, OfflineEnv):
     def __init__(self, **kwargs):
