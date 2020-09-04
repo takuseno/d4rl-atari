@@ -38,6 +38,17 @@ dataset['rewards'] # reward data in 1M
 dataset['terminals'] # terminal flags in 1M
 ```
 
+You can also disable stacking.
+```py
+env = gym.make('breakout-mixed-v0', stack=False)
+
+# single channel gray-scale image
+env.reset() # (1, 84, 84)
+
+dataset = env.get_dataset()
+dataset['observations'] # numpy.ndarray with shape of (1000000, 1, 84, 84)
+```
+
 The environment produced in this package is wrapped by dopamine-style wrapper.
 Thus, the observations between the datasets and the environment are exactly same.
 So, if you train your model with the dataset, your model is ready to interact

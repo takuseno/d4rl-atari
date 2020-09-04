@@ -114,11 +114,13 @@ class OfflineEnv(gym.Env):
         observations = np.vstack(observation_stack)
         actions = np.vstack(action_stack).reshape(-1)
         rewards = np.vstack(reward_stack).reshape(-1)
-        temrinals = np.vstack(terminal_stack).reshape(-1)
+        terminals = np.vstack(terminal_stack).reshape(-1)
 
         # memory-efficient stacking
         if self.stack:
             observations = _stack(observations, terminals)
+        else:
+            observations = observations.reshape(-1, 1, 84, 84)
 
         data_dict = {
             'observations': observations,
