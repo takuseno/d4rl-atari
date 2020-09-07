@@ -1,6 +1,7 @@
 ![format check](https://github.com/takuseno/d4rl-atari/workflows/format%20check/badge.svg)
 ![test](https://github.com/takuseno/d4rl-atari/workflows/test/badge.svg)
 ![MIT](https://img.shields.io/badge/license-MIT-blue)
+[![Gitter](https://img.shields.io/gitter/room/d3rlpy/d4rl-atari)](https://gitter.im/d3rlpy/d4rl-atari)
 
 # d4rl-atari
 Datasets for Data-Driven Deep Reinforcement Learning with Atari environments.
