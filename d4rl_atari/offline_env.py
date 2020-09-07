@@ -111,10 +111,16 @@ class OfflineEnv(gym.Env):
             reward_stack.append(rewards)
             terminal_stack.append(terminals)
 
-        observations = np.vstack(observation_stack)
-        actions = np.vstack(action_stack).reshape(-1)
-        rewards = np.vstack(reward_stack).reshape(-1)
-        terminals = np.vstack(terminal_stack).reshape(-1)
+        if len(observation_stack) > 1:
+            observations = np.vstack(observation_stack)
+            actions = np.vstack(action_stack).reshape(-1)
+            rewards = np.vstack(reward_stack).reshape(-1)
+            terminals = np.vstack(terminal_stack).reshape(-1)
+        else:
+            observations = observation_stack[0]
+            actions = action_stack[0]
+            rewards = reward_stack[0]
+            terminals = terminal_stack[0]
 
         # memory-efficient stacking
         if self.stack:
