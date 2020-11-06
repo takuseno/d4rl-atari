@@ -13,7 +13,12 @@ def capitalize_game_name(game):
 
 # dopamine style Atari wrapper
 class AtariEnv(gym.Env):
-    def __init__(self, game, frameskip=4, stack=True, **kwargs):
+    def __init__(self,
+                 game,
+                 frameskip=4,
+                 stack=True,
+                 init_random_steps=30,
+                 **kwargs):
         # set action_probability=0.25
         env_id = '{}NoFrameskip-v0'.format(game)
         atari_env = gym.make(env_id)
@@ -26,6 +31,7 @@ class AtariEnv(gym.Env):
         self.env = atari_env.env
         self.screen_shape = atari_env.observation_space.shape[:2]
         self.stack = stack
+        self.init_random_steps = init_random_steps
 
         self.frameskip = frameskip
         self.screen_buffer = np.zeros((2, ) + self.screen_shape,
@@ -34,12 +40,21 @@ class AtariEnv(gym.Env):
 
     def reset(self):
         self.env.reset()
+
+        # random initialization
+        for _ in range(np.random.randint(self.init_random_steps)):
+            _, _, done, _ = self.env.step(self.action_space.sample())
+            if done:
+                self.env.reset()
+
         self._fetch_grayscale_observation(self.screen_buffer[0])
         self.screen_buffer[1].fill(0)
         self.stack_buffer.fill(0)
         observation = self._pool_and_resize()
+
         if self.stack:
             return self._stack(observation)
+
         return observation
 
     def step(self, action):
