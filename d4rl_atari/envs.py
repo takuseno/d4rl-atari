@@ -18,6 +18,7 @@ class AtariEnv(gym.Env):
                  frameskip=4,
                  stack=True,
                  init_random_steps=30,
+                 clip_reward=False,
                  **kwargs):
         # set action_probability=0.25
         env_id = '{}NoFrameskip-v0'.format(game)
@@ -32,6 +33,7 @@ class AtariEnv(gym.Env):
         self.screen_shape = atari_env.observation_space.shape[:2]
         self.stack = stack
         self.init_random_steps = init_random_steps
+        self.clip_reward = clip_reward
 
         self.frameskip = frameskip
         self.screen_buffer = np.zeros((2, ) + self.screen_shape,
@@ -74,6 +76,9 @@ class AtariEnv(gym.Env):
 
         if self.stack:
             observation = self._stack(observation)
+
+        if self.clip_reward:
+            accumulated_reward = np.clip(accumulated_reward, -1, 1)
 
         return observation, accumulated_reward, done, info
 
