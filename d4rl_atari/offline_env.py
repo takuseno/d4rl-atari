@@ -3,10 +3,11 @@ import os
 import gym
 import gzip
 
+from os.path import expanduser
 from subprocess import Popen
 
 URI = 'gs://atari-replay-datasets/dqn/{}/{}/replay_logs/'
-BASE_DIR = os.path.join(os.environ['HOME'], '.d4rl', 'datasets')
+BASE_DIR = os.path.join(expanduser('~'), '.d4rl', 'datasets')
 
 
 def get_dir_path(env, index, epoch, base_dir=BASE_DIR):
