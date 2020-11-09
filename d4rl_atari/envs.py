@@ -19,6 +19,8 @@ class AtariEnv(gym.Env):
                  stack=True,
                  init_random_steps=30,
                  clip_reward=False,
+                 terminate_on_life_loss=False,
+                 max_frames=108000,
                  **kwargs):
         # set action_probability=0.25
         env_id = '{}NoFrameskip-v0'.format(game)
@@ -34,11 +36,15 @@ class AtariEnv(gym.Env):
         self.stack = stack
         self.init_random_steps = init_random_steps
         self.clip_reward = clip_reward
-
+        self.terminate_on_life_loss = terminate_on_life_loss
+        self.max_frames = max_frames
         self.frameskip = frameskip
+
         self.screen_buffer = np.zeros((2, ) + self.screen_shape,
                                       dtype=np.uint8)
         self.stack_buffer = np.zeros((4, 84, 84), dtype=np.uint8)
+        self.lives = 0
+        self.episode_step = 0
 
     def reset(self):
         self.env.reset()
@@ -48,6 +54,9 @@ class AtariEnv(gym.Env):
             _, _, done, _ = self.env.step(self.action_space.sample())
             if done:
                 self.env.reset()
+
+        self.lives = self.env.ale.lives()
+        self.episode_step = 0
 
         self._fetch_grayscale_observation(self.screen_buffer[0])
         self.screen_buffer[1].fill(0)
@@ -65,10 +74,15 @@ class AtariEnv(gym.Env):
             _, reward, done, info = self.env.step(action)
 
             accumulated_reward += reward
+            self.episode_step += 1
+
+            if self.terminate_on_life_loss:
+                done = done or self._check_life_loss()
 
             if done:
                 break
-            elif time_step >= self.frameskip - 2:
+
+            if time_step >= self.frameskip - 2:
                 t = time_step - (self.frameskip - 2)
                 self._fetch_grayscale_observation(self.screen_buffer[t])
 
@@ -80,7 +94,16 @@ class AtariEnv(gym.Env):
         if self.clip_reward:
             accumulated_reward = np.clip(accumulated_reward, -1, 1)
 
+        if self.episode_step > self.max_frames:
+            done = True
+
         return observation, accumulated_reward, done, info
+
+    def _check_life_loss(self):
+        curr_lives = self.env.ale.lives()
+        is_terminal = curr_lives < self.lives
+        self.lives = curr_lives
+        return is_terminal
 
     def _fetch_grayscale_observation(self, output):
         self.env.ale.getScreenGrayscale(output)
