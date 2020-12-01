@@ -17,7 +17,7 @@ class AtariEnv(gym.Env):
                  game,
                  frameskip=4,
                  stack=True,
-                 init_random_steps=30,
+                 init_noop_steps=30,
                  clip_reward=False,
                  terminate_on_life_loss=False,
                  max_frames=108000,
@@ -34,7 +34,7 @@ class AtariEnv(gym.Env):
         self.env = atari_env.env
         self.screen_shape = atari_env.observation_space.shape[:2]
         self.stack = stack
-        self.init_random_steps = init_random_steps
+        self.init_noop_steps = init_noop_steps
         self.clip_reward = clip_reward
         self.terminate_on_life_loss = terminate_on_life_loss
         self.max_frames = max_frames
@@ -50,8 +50,8 @@ class AtariEnv(gym.Env):
         self.env.reset()
 
         # random initialization
-        for _ in range(np.random.randint(self.init_random_steps)):
-            _, _, done, _ = self.env.step(self.action_space.sample())
+        for _ in range(np.random.randint(self.init_noop_steps)):
+            _, _, done, _ = self.env.step(0)
             if done:
                 self.env.reset()
 
