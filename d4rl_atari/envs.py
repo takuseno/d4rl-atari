@@ -45,9 +45,11 @@ class AtariEnv(gym.Env):
         self.stack_buffer = np.zeros((4, 84, 84), dtype=np.uint8)
         self.lives = 0
         self.episode_step = 0
+        self.real_done = False
 
     def reset(self):
-        self.env.reset()
+        if self.real_done:
+            self.env.reset()
 
         # random initialization
         for _ in range(np.random.randint(self.init_noop_steps)):
@@ -57,6 +59,7 @@ class AtariEnv(gym.Env):
 
         self.lives = self.env.ale.lives()
         self.episode_step = 0
+        self.real_done = False
 
         self._fetch_grayscale_observation(self.screen_buffer[0])
         self.screen_buffer[1].fill(0)
@@ -64,6 +67,9 @@ class AtariEnv(gym.Env):
         observation = self._pool_and_resize()
 
         if self.stack:
+            # fill blacks
+            for _ in range(3):
+                self._stack(observation)
             return self._stack(observation)
 
         return observation
@@ -75,6 +81,7 @@ class AtariEnv(gym.Env):
 
             accumulated_reward += reward
             self.episode_step += 1
+            self.real_done = done
 
             if self.terminate_on_life_loss:
                 done = done or self._check_life_loss()
@@ -96,6 +103,7 @@ class AtariEnv(gym.Env):
 
         if self.episode_step > self.max_frames:
             done = True
+            self.real_done = True
 
         return observation, accumulated_reward, done, info
 
