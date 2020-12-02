@@ -45,7 +45,7 @@ class AtariEnv(gym.Env):
         self.stack_buffer = np.zeros((4, 84, 84), dtype=np.uint8)
         self.lives = 0
         self.episode_step = 0
-        self.real_done = False
+        self.real_done = True
 
     def reset(self):
         if self.real_done:
