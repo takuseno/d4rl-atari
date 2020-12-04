@@ -20,10 +20,11 @@ class AtariEnv(gym.Env):
                  init_noop_steps=30,
                  clip_reward=False,
                  terminate_on_life_loss=False,
+                 sticky_action=False,
                  max_frames=108000,
                  **kwargs):
-        # set action_probability=0.25
-        env_id = '{}NoFrameskip-v0'.format(game)
+        # set action_probability=0.25 if sticky_action=True
+        env_id = '{}NoFrameskip-v{}'.format(game, 0 if sticky_action else 4)
         atari_env = gym.make(env_id)
         n_channels = 4 if stack else 1
         self.observation_space = spaces.Box(low=0,
