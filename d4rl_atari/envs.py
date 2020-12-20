@@ -51,9 +51,11 @@ class AtariEnv(gym.Env):
     def reset(self):
         if self.real_done:
             self.env.reset()
+        else:
+            self.env.step(0)
 
         # random initialization
-        for _ in range(np.random.randint(self.init_noop_steps)):
+        for _ in range(np.random.randint(self.init_noop_steps) + 1):
             _, _, done, _ = self.env.step(0)
             if done:
                 self.env.reset()
