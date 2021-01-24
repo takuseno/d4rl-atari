@@ -3,6 +3,7 @@ import gym
 import cv2
 
 from gym import spaces
+from gym.wrappers import AtariPreprocessing, TransformReward, FrameStack
 from .offline_env import OfflineEnv
 
 
@@ -11,133 +12,40 @@ def capitalize_game_name(game):
     return ''.join([g.capitalize() for g in game.split('_')])
 
 
-# dopamine style Atari wrapper
 class AtariEnv(gym.Env):
     def __init__(self,
                  game,
-                 frameskip=4,
-                 stack=True,
-                 init_noop_steps=30,
-                 clip_reward=False,
-                 terminate_on_life_loss=False,
+                 stack=False,
                  sticky_action=False,
-                 max_frames=108000,
+                 clip_reward=False,
+                 terminal_on_life_loss=False,
                  **kwargs):
         # set action_probability=0.25 if sticky_action=True
         env_id = '{}NoFrameskip-v{}'.format(game, 0 if sticky_action else 4)
-        atari_env = gym.make(env_id)
-        n_channels = 4 if stack else 1
-        self.observation_space = spaces.Box(low=0,
-                                            high=255,
-                                            shape=(n_channels, 84, 84),
-                                            dtype=np.uint8)
-        self.action_space = atari_env.action_space
-        self.env = atari_env.env
-        self.screen_shape = atari_env.observation_space.shape[:2]
-        self.stack = stack
-        self.init_noop_steps = init_noop_steps
-        self.clip_reward = clip_reward
-        self.terminate_on_life_loss = terminate_on_life_loss
-        self.max_frames = max_frames
-        self.frameskip = frameskip
 
-        self.screen_buffer = np.zeros((2, ) + self.screen_shape,
-                                      dtype=np.uint8)
-        self.stack_buffer = np.zeros((4, 84, 84), dtype=np.uint8)
-        self.lives = 0
-        self.episode_step = 0
-        self.real_done = True
+        # use official atari wrapper
+        env = AtariPreprocessing(gym.make(env_id),
+                                 terminal_on_life_loss=terminal_on_life_loss)
 
-    def reset(self):
-        if self.real_done:
-            self.env.reset()
-        else:
-            self.env.step(0)
+        if stack:
+            env = FrameStack(env, num_stack=4)
 
-        # random initialization
-        for _ in range(np.random.randint(self.init_noop_steps) + 1):
-            _, _, done, _ = self.env.step(0)
-            if done:
-                self.env.reset()
+        if clip_reward:
+            env = TransformReward(env, lambda r: np.clip(r, -1.0, 1.0))
 
-        self.lives = self.env.ale.lives()
-        self.episode_step = 0
-        self.real_done = False
+        self._env = env
 
-        self._fetch_grayscale_observation(self.screen_buffer[0])
-        self.screen_buffer[1].fill(0)
-        self.stack_buffer.fill(0)
-        observation = self._pool_and_resize()
-
-        if self.stack:
-            # fill blacks
-            for _ in range(3):
-                self._stack(observation)
-            return self._stack(observation)
-
-        return observation
+        self.observation_space = env.observation_space
+        self.action_space = env.action_space
 
     def step(self, action):
-        accumulated_reward = 0.0
-        for time_step in range(self.frameskip):
-            _, reward, done, info = self.env.step(action)
+        return self._env.step(action)
 
-            accumulated_reward += reward
-            self.episode_step += 1
-            self.real_done = done
-
-            if self.terminate_on_life_loss:
-                done = done or self._check_life_loss()
-
-            if done:
-                break
-
-            if time_step >= self.frameskip - 2:
-                t = time_step - (self.frameskip - 2)
-                self._fetch_grayscale_observation(self.screen_buffer[t])
-
-        observation = self._pool_and_resize()
-
-        if self.stack:
-            observation = self._stack(observation)
-
-        if self.clip_reward:
-            accumulated_reward = np.clip(accumulated_reward, -1, 1)
-
-        if self.episode_step > self.max_frames:
-            done = True
-            self.real_done = True
-
-        return observation, accumulated_reward, done, info
-
-    def _check_life_loss(self):
-        curr_lives = self.env.ale.lives()
-        is_terminal = curr_lives < self.lives
-        self.lives = curr_lives
-        return is_terminal
-
-    def _fetch_grayscale_observation(self, output):
-        self.env.ale.getScreenGrayscale(output)
-        return output
-
-    def _pool_and_resize(self):
-        max_pixel = np.max(self.screen_buffer, axis=0)
-        self.screen_buffer[0][...] = max_pixel
-
-        resized_screen = cv2.resize(self.screen_buffer[0], (84, 84),
-                                    interpolation=cv2.INTER_AREA)
-
-        image = np.asarray(resized_screen, dtype=np.uint8)
-
-        return np.expand_dims(image, axis=0)
-
-    def _stack(self, observation):
-        self.stack_buffer = np.roll(self.stack_buffer, -1, axis=0)
-        self.stack_buffer[-1][...] = observation[0]
-        return self.stack_buffer
+    def reset(self):
+        return self._env.reset()
 
     def render(self, mode='human'):
-        self.env.render(mode)
+        self._env.render(mode)
 
 
 class OfflineAtariEnv(AtariEnv, OfflineEnv):

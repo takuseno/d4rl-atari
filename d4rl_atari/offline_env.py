@@ -76,7 +76,7 @@ class OfflineEnv(gym.Env):
                  index=None,
                  start_epoch=None,
                  last_epoch=None,
-                 stack=True,
+                 stack=False,
                  **kwargs):
         super(OfflineEnv, self).__init__(**kwargs)
         self.game = game

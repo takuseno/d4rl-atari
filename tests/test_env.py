@@ -33,10 +33,16 @@ def test_env(stack):
         n_channels = 1
 
     observation = env.reset()
-    assert observation.shape == (n_channels, 84, 84)
+    if stack:
+        assert observation.shape == (4, 84, 84)
+    else:
+        assert observation.shape == (84, 84)
 
     observation = env.step(1)[0]
-    assert observation.shape == (n_channels, 84, 84)
+    if stack:
+        assert observation.shape == (4, 84, 84)
+    else:
+        assert observation.shape == (84, 84)
 
     # check if last element is the latest
     next_observation = env.step(2)[0]
