@@ -28,26 +28,15 @@ import d4rl_atari
 env = gym.make('breakout-mixed-v0') # -v{0, 1, 2, 3, 4} for datasets with the other random seeds
 
 # interaction with its environment through dopamine-style Atari wrapper
-env.reset() # observation is resized to 4x84x84 with frameskipping=4 enabled
-env.step(env.action_space.sample())
+observation = env.reset() # observation.shape == (84, 84)
+observation, reward, terminal, info = env.step(env.action_space.sample())
 
 # dataset will be automatically downloaded into ~/.d4rl/datasets/[GAME]/[INDEX]/[EPOCH]
 dataset = env.get_dataset()
-dataset['observations'] # observation data in list of 1M ndarrays with shape of 4 x 84 x 84 
-dataset['actions'] # action data in 1M
-dataset['rewards'] # reward data in 1M
-dataset['terminals'] # terminal flags in 1M
-```
-
-You can also disable stacking.
-```py
-env = gym.make('breakout-mixed-v0', stack=False)
-
-# single channel gray-scale image
-env.reset() # (1, 84, 84)
-
-dataset = env.get_dataset()
-dataset['observations'] # numpy.ndarray with shape of (1000000, 1, 84, 84)
+dataset['observations'] # observation data in (1000000, 1, 84, 84)
+dataset['actions'] # action data in (1000000,)
+dataset['rewards'] # reward data in (1000000,)
+dataset['terminals'] # terminal flags in (1000000,)
 ```
 
 The environment produced in this package is wrapped by dopamine-style wrapper.
@@ -56,6 +45,17 @@ So, if you train your model with the dataset, your model is ready to interact
 with the environment.
 
 ### stacking observations
+You can stack observations.
+```py
+env = gym.make('breakout-mixed-v0', stack=True)
+
+# stacked gray-scale image
+env.reset() # (4, 84, 84)
+
+dataset = env.get_dataset()
+dataset['observations'] # a list of 1M arrays with shape of (4, 84, 84)
+```
+
 The observations included in dataset are shaped in `(1000000, 84, 84)` without
 stacked.
 To easily feed this dataset to RL models, the observations should be stacked
