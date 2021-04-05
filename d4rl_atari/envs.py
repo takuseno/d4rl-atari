@@ -47,6 +47,10 @@ class AtariEnv(gym.Env):
     def render(self, mode='human'):
         self._env.render(mode)
 
+    def seed(self, seed=None):
+        super().seed(seed)
+        self._env.seed(seed)
+
 
 class OfflineAtariEnv(AtariEnv, OfflineEnv):
     def __init__(self, **kwargs):
