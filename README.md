@@ -87,6 +87,12 @@ env = gym.make('[GAME]-{mixed,medium,expert}-v{0, 1, 2, 3, 4}')
 - `medium` denotes datasets collected at between 9M steps and 10M steps.
 - `expert` denotes datasets collected at the last 1M steps.
 
+Alternatively, you can get the datasets by specifying an epoch.
+
+```
+env = gym.make('[GAME]-epoch-v[EPOCH]')
+```
+
 
 ## contribution
 Any contributions will be welcomed!!
