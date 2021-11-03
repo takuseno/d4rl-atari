@@ -90,7 +90,7 @@ env = gym.make('[GAME]-{mixed,medium,expert}-v{0, 1, 2, 3, 4}')
 Alternatively, you can get the datasets by specifying an epoch.
 
 ```
-env = gym.make('[GAME]-epoch-v[EPOCH]')
+env = gym.make('[GAME]-epoch-[EPOCH]-v{0, 1, 2, 3, 4}')
 ```
 
 

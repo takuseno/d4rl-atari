@@ -48,13 +48,14 @@ for game in [
                      'last_epoch': 50
                  })
 
-    for index in range(50):
-        register(id='{}-epoch-v{}'.format(game, index + 1),
-                 entry_point='d4rl_atari.envs:OfflineAtariEnv',
-                 max_episode_steps=108000,
-                 kwargs={
-                     'game': game,
-                     'index': index + 1,
-                     'start_epoch': index + 1,
-                     'last_epoch': index + 1,
-                 })
+    for index in range(5):
+        for epoch in range(50):
+            register(id='{}-epoch-{}-v{}'.format(game, epoch + 1, index),
+                     entry_point='d4rl_atari.envs:OfflineAtariEnv',
+                     max_episode_steps=108000,
+                     kwargs={
+                         'game': game,
+                         'index': index + 1,
+                         'start_epoch': epoch + 1,
+                         'last_epoch': epoch + 1,
+                     })
