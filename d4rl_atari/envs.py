@@ -25,7 +25,10 @@ class AtariEnv(gym.Env):
         env_id = '{}NoFrameskip-v{}'.format(game, 0 if sticky_action else 4)
 
         # use official atari wrapper
-        env = AtariPreprocessing(gym.make(env_id, **kwargs),
+        params = {}
+        if "render_mode" in kwargs:
+            params["render_mode"] = kwargs["render_mode"]
+        env = AtariPreprocessing(gym.make(env_id, **params),
                                  terminal_on_life_loss=terminal_on_life_loss)
 
         if stack:
@@ -45,12 +48,12 @@ class AtariEnv(gym.Env):
     def reset(self):
         return self._env.reset()
 
-    def render(self, mode='human'):
-        self._env.render(mode)
+    def render(self):
+        return self._env.render()
 
-    def seed(self, seed=None):
-        super().seed(seed)
-        self._env.seed(seed)
+    @property
+    def render_mode(self):
+        return self._env.render_mode
 
 
 class OfflineAtariEnv(AtariEnv, OfflineEnv):
