@@ -71,7 +71,7 @@ def _stack(observations, terminals, n_channels=4):
     return rets
 
 
-class OfflineEnv(gym.Env):
+class OfflineEnv:
 
     def __init__(self,
                  game=None,
@@ -80,7 +80,6 @@ class OfflineEnv(gym.Env):
                  last_epoch=None,
                  stack=False,
                  **kwargs):
-        super(OfflineEnv, self).__init__(**kwargs)
         self.game = game
         self.index = index
         self.start_epoch = start_epoch
