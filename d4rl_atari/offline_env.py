@@ -7,7 +7,8 @@ from os.path import expanduser
 from subprocess import Popen
 
 URI = 'gs://atari-replay-datasets/dqn/{}/{}/replay_logs/'
-BASE_DIR = os.environ.get('D4RL_DATASET_DIR', os.path.join(expanduser('~'), '.d4rl', 'datasets'))
+BASE_DIR = os.environ.get('D4RL_DATASET_DIR',
+                          os.path.join(expanduser('~'), '.d4rl', 'datasets'))
 
 
 def get_dir_path(env, index, epoch, base_dir=BASE_DIR):
@@ -71,6 +72,7 @@ def _stack(observations, terminals, n_channels=4):
 
 
 class OfflineEnv(gym.Env):
+
     def __init__(self,
                  game=None,
                  index=None,
@@ -78,7 +80,7 @@ class OfflineEnv(gym.Env):
                  last_epoch=None,
                  stack=False,
                  **kwargs):
-        super(OfflineEnv, self).__init__()
+        super(OfflineEnv, self).__init__(**kwargs)
         self.game = game
         self.index = index
         self.start_epoch = start_epoch

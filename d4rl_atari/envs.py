@@ -13,6 +13,7 @@ def capitalize_game_name(game):
 
 
 class AtariEnv(gym.Env):
+
     def __init__(self,
                  game,
                  stack=False,
@@ -53,6 +54,7 @@ class AtariEnv(gym.Env):
 
 
 class OfflineAtariEnv(AtariEnv, OfflineEnv):
+
     def __init__(self, **kwargs):
         game = capitalize_game_name(kwargs['game'])
         del kwargs['game']
