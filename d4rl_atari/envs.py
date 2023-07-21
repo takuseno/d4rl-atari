@@ -25,7 +25,7 @@ class AtariEnv(gym.Env):
         env_id = '{}NoFrameskip-v{}'.format(game, 0 if sticky_action else 4)
 
         # use official atari wrapper
-        env = AtariPreprocessing(gym.make(env_id),
+        env = AtariPreprocessing(gym.make(env_id, **kwargs),
                                  terminal_on_life_loss=terminal_on_life_loss)
 
         if stack:
