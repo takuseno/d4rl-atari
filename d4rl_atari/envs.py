@@ -45,11 +45,11 @@ class AtariEnv(gym.Env):
     def step(self, action):
         return self._env.step(action)
 
-    def reset(self):
-        return self._env.reset()
+    def reset(self, *args, **kwargs):
+        return self._env.reset(*args, **kwargs)
 
-    def render(self):
-        return self._env.render()
+    def render(self, *args, **kwargs):
+        return self._env.render(*args, **kwargs)
 
     @property
     def render_mode(self):
